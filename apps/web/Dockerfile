@@ -4,12 +4,12 @@ WORKDIR /app
 
 RUN npm install -g pnpm
 
-
 COPY pnpm-lock.yaml ./
 COPY package.json ./ 
 COPY turbo.json ./
 
 COPY apps/web/package.json ./apps/web/
+COPY apps/api/package.json ./apps/api/
 COPY packages/ui/package.json ./packages/ui/
 
 RUN pnpm install --frozen-lockfile
