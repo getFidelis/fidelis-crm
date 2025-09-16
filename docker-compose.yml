@@ -13,21 +13,23 @@ services:
       - fidelis_db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+  
+  # --- Fidelis Backend (API) Service ---
   backend:
     build:
-      context: . 
-      dockerfile: ./apps/api/Dockerfile 
+      context: . # Build context is the monorepo root
+      dockerfile: ./apps/api/Dockerfile # Path to the backend Dockerfile
     restart: always
     environment:
       DATABASE_URL: postgresql://${DATABASE_USER:-user}:${DATABASE_PASSWORD:-password}@db:5432/fidelis?schema=public
       JWT_SECRET: ${JWT_SECRET:-your_super_secret_jwt_key_please_change}
-      PORT: 3051 
+      PORT: 3051
       NODE_ENV: production
     ports:
-      - "3051:3051" 
+      - "3051:3051"
     depends_on:
       - db
-    healthcheck: 
+    healthcheck: # Ensure database is ready before trying migrations
       test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-user} -d fidelis"]
       interval: 5s
       timeout: 5s
@@ -35,13 +37,14 @@ services:
     entrypoint: ["sh", "-c", "/usr/local/share/pnpm/pnpm prisma:migrate:deploy && /usr/local/share/pnpm/pnpm start"]
 
 
+  # --- Fidelis Frontend (Web) Service ---
   frontend:
     build:
-      context: . 
-      dockerfile: ./apps/web/Dockerfile 
+      context: . # Build context is the monorepo root
+      dockerfile: ./apps/web/Dockerfile # Path to the frontend Dockerfile
     restart: always
     environment:
-      NEXT_PUBLIC_API_URL: ${FRONTEND_API_URL:-http://backend:3051/api}
+      NEXT_PUBLIC_API_URL: ${FRONTEND_API_URL:-http://backend:3051/api} # Verweist auf den 'backend'-Service
       NODE_ENV: production
     ports:
       - "3050:3050"
