@@ -19,7 +19,7 @@ COPY . .
 
 RUN pnpm --filter=api build
 
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 # This needs careful selection. For Hono, it's typically the dist folder and prisma client.
