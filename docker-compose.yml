@@ -1,0 +1,59 @@
+# docker-compose.yml (im Root des Fidelis Monorepos)
+version: '3.8'
+
+services:
+  # --- PostgreSQL Database Service ---
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: fidelis
+      POSTGRES_USER: ${DATABASE_USER:-user}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-password}
+    volumes:
+      - fidelis_db_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5433" # Optional: Expose for direct local connection if needed
+
+  # --- Fidelis api Service ---
+  api:
+    build:
+      context: . # Build context is the monorepo root
+      dockerfile: ./apps/api/Dockerfile # Path to the api Dockerfile
+    restart: always
+    environment:
+      # DATABASE_URL will be constructed using the service name 'db'
+      DATABASE_URL: postgresql://${DATABASE_USER:-user}:${DATABASE_PASSWORD:-password}@db:5433/fidelis?schema=public
+      JWT_SECRET: ${JWT_SECRET:-your_super_secret_jwt_key_please_change}
+      PORT: 3051
+      NODE_ENV: production
+    ports:
+      - "3051:3051"
+    depends_on:
+      - db
+    # Healthcheck to ensure database is ready before starting the app
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-user} -d fidelis"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # --- Fidelis web Service ---
+  web:
+    build:
+      context: . # Build context is the monorepo root
+      dockerfile: ./apps/web/Dockerfile # Path to the web Dockerfile
+    restart: always
+    environment:
+      NEXT_PUBLIC_API_URL: ${web_API_URL:-http://localhost:3051/api} # Default for local docker-compose
+      NODE_ENV: production
+    ports:
+      - "3050:3050"
+    depends_on:
+      - api # web needs api to be up
+    # If the web needs the api to be fully healthy before serving
+    # you might add a custom healthcheck or an entrypoint script to wait.
+    # For Next.js, it's often fine to start and let it retry API calls.
+
+volumes:
+  fidelis_db_data:

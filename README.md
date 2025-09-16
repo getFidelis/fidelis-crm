@@ -1,135 +1,127 @@
-# Turborepo starter
+# Fidelis CRM Monorepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+Welcome to the Fidelis CRM project! This monorepo houses the frontend, backend, and shared packages for a modular, open-source CRM solution.
 
-## Using this example
+## Table of Contents
 
-Run the following command:
+- [Project Overview](#project-overview)
+- [Monorepo Structure](#monorepo-structure)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+  - [Development Container (Recommended)](#development-container-recommended)
+  - [Local Setup](#local-setup)
+- [Available Scripts](#available-scripts)
+- [Backend (apps/backend)](#backend-appsbackend)
+- [Frontend (apps/frontend)](#frontend-appsfrontend)
+- [Shared Packages](#shared-packages)
+- [Contributing](#contributing)
+- [License](#license)
 
-```sh
-npx create-turbo@latest
-```
+## Project Overview
 
-## What's inside?
+Fidelis is an open-source Customer Relationship Management (CRM) system designed for simplicity and extensibility. It aims to provide essential CRM functionalities for managing contacts, organizations, and interactions.
 
-This Turborepo includes the following packages/apps:
+## Monorepo Structure
 
-### Apps and Packages
+-   `apps/frontend`: Next.js application (TypeScript, App Router, TailwindCSS)
+-   `apps/backend`: Hono API (TypeScript, REST API, OpenAPI)
+-   `packages/ui`: Shared React component library (Tailwind, Radix UI)
+-   `packages/utils`: Common helper and utility functions
+-   `packages/types`: Shared TypeScript type definitions
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## Prerequisites
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+Before you begin, ensure you have the following installed:
 
-### Utilities
+-   [Node.js](https://nodejs.org/) (v18 or higher)
+-   [PNPM](https://pnpm.io/) (v9 or higher)
+-   [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) (for dev container or local database)
 
-This Turborepo has some additional tools already setup for you:
+## Getting Started
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+### Development Container (Recommended)
 
-### Build
+The easiest way to get started is by using the provided Dev Container setup. This will create a consistent development environment with all dependencies pre-configured.
 
-To build all apps and packages, run the following command:
+1.  **Install VS Code Remote - Containers extension:** If you're using VS Code, install the "Remote - Containers" extension.
+2.  **Open in Container:**
+    -   Open this project in VS Code.
+    -   VS Code will prompt you to "Reopen in Container". Click it.
+    -   Alternatively, open the command palette (Ctrl+Shift+P or Cmd+Shift+P) and select "Remote-Containers: Reopen in Container".
+3.  The Dev Container will build (this might take a few minutes the first time) and provision a PostgreSQL database.
 
-```
-cd my-turborepo
+### Local Setup
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+If you prefer to set up locally:
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+1.  **Install PNPM dependencies:**
+    ```bash
+    pnpm install
+    ```
+2.  **Database Setup:**
+    -   Ensure you have a PostgreSQL database running. You can use Docker:
+        ```bash
+        docker compose -f .devcontainer/docker-compose.yml up -d db
+        ```
+    -   Copy the root `.env.example` to `.env` and fill in your database connection string and other environment variables.
+        ```bash
+        cp .env.example .env
+        # Edit .env with your specific values
+        ```
+3.  **Generate Prisma Client and Run Migrations:**
+    ```bash
+    pnpm run --filter=backend prisma:generate
+    pnpm run --filter=backend prisma:migrate:deploy
+    ```
+4.  **Start Development Servers:**
+    ```bash
+    pnpm dev
+    ```
+    This will start both the backend and frontend in development mode.
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+## Available Scripts
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+These scripts can be run from the root of the monorepo:
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+-   `pnpm dev`: Starts all `dev` scripts in parallel (backend and frontend).
+-   `pnpm build`: Builds all applications and packages.
+-   `pnpm lint`: Lints all applications and packages.
+-   `pnpm format`: Formats all code with Prettier.
+-   `pnpm format:check`: Checks if all code is formatted correctly.
+-   `pnpm test`: Runs tests across all applications and packages.
+-   `pnpm type-check`: Runs TypeScript type checks.
+-   `pnpm clean`: Cleans build outputs and `node_modules`.
 
-### Develop
+You can also run scripts for specific apps/packages using `pnpm run --filter=<package-name> <script>`. For example:
+-   `pnpm run --filter=backend dev`
+-   `pnpm run --filter=frontend build`
 
-To develop all apps and packages, run the following command:
+## Backend (`apps/backend`)
 
-```
-cd my-turborepo
+The backend is built with Hono.js and provides a REST API for core CRM functionalities.
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+-   **Technologies:** Hono, Prisma (PostgreSQL), Zod, JWT
+-   **API Documentation:** Accessible via `/swagger` endpoint when the backend is running.
+-   **Environment Variables:** See `apps/backend/.env.example`.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+## Frontend (`apps/frontend`)
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+The frontend is a Next.js application using the App Router.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+-   **Technologies:** Next.js, React, TypeScript, TailwindCSS, shadcn/ui
+-   **Reusable Components:** Utilizes components from `packages/ui`.
+-   **Environment Variables:** See `apps/frontend/.env.example`.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+## Shared Packages
 
-### Remote Caching
+-   `packages/ui`: A collection of reusable React components using Tailwind CSS and Radix UI.
+-   `packages/utils`: General utility functions and helpers that can be used across the monorepo.
+-   `packages/types`: Shared TypeScript interfaces and types for consistent data modeling between frontend and backend.
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+## Contributing
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get involved.
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+## License
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
