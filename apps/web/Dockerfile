@@ -22,7 +22,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Build the specific web application using Turborepo filter
-RUN pnpm --filter web build
+RUN pnpm --filter=web build
 
 # Stage 2: Run the Next.js application
 FROM node:20-alpine AS runner
