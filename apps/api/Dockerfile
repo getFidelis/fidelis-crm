@@ -9,9 +9,7 @@ WORKDIR /app
 COPY pnpm-lock.yaml ./
 COPY package.json ./
 COPY turbo.json ./
-COPY packages/types/package.json ./packages/types/
 
-COPY packages/utils/package.json ./packages/utils/
 COPY apps/api/package.json ./apps/api/
 
 RUN npm install -g pnpm
