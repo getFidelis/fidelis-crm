@@ -4,7 +4,7 @@ version: '3.8'
 services:
   # --- PostgreSQL Database Service ---
   db:
-    image: postgres:16-alpine
+    image: docker.io/bitnami/postgresql:17
     restart: always
     environment:
       POSTGRES_DB: fidelis
@@ -56,4 +56,4 @@ services:
       - backend # Frontend needs backend to be up
 
 volumes:
-  fidelis_db_data:
+  pgdata:

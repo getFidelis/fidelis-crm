@@ -1,7 +1,7 @@
 # apps/api/Dockerfile (für Produktion/Deployment)
 
 # Stage 1: Build the Hono application using the full monorepo context and Turborepo
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -39,20 +39,9 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV PORT 3051 # Angepasster Port
 
-# Re-install pnpm for the runner stage
 RUN npm install -g pnpm
 
-# Copy only the necessary runtime files from the builder stage for a Hono/Prisma app
-# 1. The built API application (dist folder)
 COPY --from=builder /app/apps/api/dist ./dist
-# 2. The prisma schema and migrations (needed for `prisma:migrate:deploy` and runtime client)
-#    Stelle sicher, dass der 'prisma'-Ordner in apps/api liegt.
-COPY --from=builder /app/apps/api/prisma ./prisma
-# 3. The package.json of the API (needed for `pnpm start` and `prisma:migrate:deploy`)
-COPY --from=builder /app/apps/api/package.json ./package.json
-
-# Re-install *only production* dependencies in the runner stage based on the copied package.json.
-# This ensures a minimal node_modules for the runner.
 RUN pnpm install --prod
 
 # Expose the port
